@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+  php:
+    ports:
+      - 82:80
+    image: thecodingmachine/php:7.1-v3-apache
+    container_name: popup_ticket
+    restart: unless-stopped
+    volumes:
+      - './:/var/www/html'
+    extra_hosts: # <-- this is required
+      - "host.docker.internal:host-gateway"   
+    environment:
+        TZ: UTC
+        PHP_EXTENSION_PGSQL: 1
+        PHP_EXTENSION_PDO_PGSQL: 1
+        PHP_EXTENSION_MYSQLI: 0
+        PHP_EXTENSION_GD: 1
+        PHP_EXTENSION_IMAGICK: 1
+        PHP_EXTENSION_EXIF: 1
+        PHP_EXTENSION_ZIP: 1
+        PHP_INI_MAX_EXECUTION_TIME: 300
+        PHP_INI_MAX_INPUT_TIME: 300
+        PHP_INI_MEMORY_LIMIT: 512M
+        PHP_INI_POST_MAX_SIZE: 20M
+        PHP_INI_UPLOAD_MAX_FILESIZE: 20M
+        # APACHE_DOCUMENT_ROOT: .
+        # APACHE_RUN_USER: www-data
+        # APACHE_RUN_GROUP: www-data
+        # CRON_USER_1: www-data
+        # CRON_SCHEDULE_1: '* * * * *'
+        # CRON_COMMAND_1: 'cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1'
+        # STARTUP_COMMAND_1: "COMPOSER_MEMORY_LIMIT=-1 composer install"
+        #STARTUP_COMMAND_1: "COMPOSER_MEMORY_LIMIT=-1 composer update"
+        #STARTUP_COMMAND_2: "chmod 777 -R /var/www/html/storage/"
+        #STARTUP_COMMAND_3: "chmod 777 -R /var/www/html/public/"
+        #STARTUP_COMMAND_4: "cp .env.dev .env"
+  postgres-service:
+    image: postgres:latest
+    container_name: postgres-container
+    ports:
+      - 5432:5432/tcp
+    extra_hosts: # <-- this is required
+      - "host.docker.internal:host-gateway"   
+    environment:
+      POSTGRES_DB: fusionpbx
+      POSTGRES_USER: fusionpbx
+      POSTGRES_PASSWORD: MFhMkW9wnCtg2yKdsbiBoFWKDA
+    volumes:
+      - pdb_data:/var/lib/postgresql/data
+
+  adminer:
+    image: dockette/adminer:full
+    restart: unless-stopped
+    ports:
+      - 8001:80
+
+volumes:
+  pdb_data:
+    driver: local
